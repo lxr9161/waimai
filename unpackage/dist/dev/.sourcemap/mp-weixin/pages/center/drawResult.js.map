@@ -1,1 +1,0 @@
-{"version":3,"sources":["uni-app:///main.js"],"names":["createPage","Page"],"mappings":";;;;;;;;;;kDAAA;AACA;AACA,uG;AACAA,UAAU,CAACC,mBAAD,CAAV,C","file":"pages/center/drawResult.js","sourcesContent":["import 'uni-pages';\nimport Vue from 'vue'\nimport Page from './pages/center/drawResult.vue'\ncreatePage(Page)"],"sourceRoot":""}

@@ -1,1 +1,0 @@
-page{background-color:#fff}.nl_income-item{position:relative;padding:20rpx 40rpx;border-bottom:1px solid #eee}.nl_income-amount{font-size:32rpx}.nl_income-time{font-size:28rpx;color:#aaa}.nl_income-type{position:absolute;top:40rpx;right:40rpx;color:#666;font-size:28rpx}.nl_income-desc{margin-left:6rpx;font-size:28rpx}
