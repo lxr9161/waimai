@@ -1,0 +1,1 @@
+<view><view class="nl_income-list"><block wx:for="{{list}}" wx:for-item="item" wx:for-index="key" wx:key="key"><view class="nl_income-item"><view class="nl_income-amount">{{"+"+item.amount}}</view><view class="nl_income-time">{{item.created_at}}</view><view class="nl_income-type"><text>{{item.order_type}}</text></view></view></block></view></view>
