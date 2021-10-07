@@ -10,3 +10,5 @@
 - 文件`utils/request.js`, 配置项 `globalData`
   - `API_HOST` API请求域名
 
+## 小程序
+![小程序二维码](http://statics.nulizhe.com/web/images/11.jpg)
