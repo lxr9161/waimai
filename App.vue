@@ -2,10 +2,10 @@
 	const api = require('./utils/request')
 	export default {
 		globalData: {
-			// apiHost: 'https://game.zzz.nulizhe.com',
-			// imgHost: 'https://game.zzz.nulizhe.com/',
-			apiHost: 'https://coupon.api.nulizhe.com',
-			imgHost: 'https://coupon.api.nulizhe.com',
+			// API请求域名
+			apiHost: 'https://xxxx',
+			// 图片地址域名
+			imgHost: 'https://xxxxx',
 		},
 		onLaunch: function() {
 		},

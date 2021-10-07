@@ -1,6 +1,6 @@
 import Vue from 'vue'
-const API_HOST = 'https://coupon.api.nulizhe.com'
-// const API_HOST = 'https://game.zzz.nulizhe.com'
+// API域名
+const API_HOST = ''
 
 let header = {
 	'content-type': 'application/json'
