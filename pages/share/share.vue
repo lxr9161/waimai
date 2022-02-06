@@ -6,9 +6,13 @@
 			<image class="nl_red-icon" :src="imgHost + couponInfo.icon"></image>
 		</view>
 		<view>
-			<view class="nl_share-red-title">好友分享给你红包</view>
-			<view class="nl_share-red-max">最高</view>
-			<view class="nl_share-red-price">{{ couponInfo.price }}元</view>
+			<view class="nl_share-red-title">好友送你红包啦</view>
+			<view class="nl_share-red-subtitle">{{ couponInfo.name }}</view>
+			<view v-if="couponInfo.price > 0">
+				<view class="nl_share-red-max">最高</view>
+				<view class="nl_share-red-price">{{ couponInfo.price }}元</view>
+			</view>
+			<view v-else style="height: 180rpx;"></view>
 			<navigator class="nl-share-get" open-type="navigate" target="miniProgram" :app-id="couponInfo.cps_link.appid" :path="couponInfo.cps_link.link">前往领取</navigator>
 		</view>
 	</view>
@@ -20,11 +24,16 @@
 			return {
 				imgHost: getApp().globalData.imgHost,
 				couponInfo: {
-					price: 66,
+					price: 0,
 					link: '',
-					icon: ''
+					icon: '',
+					name: ''
 				}
 			}
+		},
+		onShareAppMessage (event) {
+		},
+		onShareTimeline () {
 		},
 		onLoad(options) {
 			let params = {
@@ -45,18 +54,18 @@
 								success: function (loginRes) {
 									_this.$postR('/api/login', { code: loginRes.code }, false).then(res => {
 										if (res.status === 'success') {
-											if (res.info.openid === params.invite_user) {
-												uni.showModal({
-													content: '不能领自己分享的红包',
-													showCancel: false,
-													success: function () {
-														uni.switchTab({
-															url: '/pages/index/index'
-														})
-													}
-												})
-												return
-											}
+											// if (res.info.openid === params.invite_user) {
+											// 	uni.showModal({
+											// 		content: '不能领自己分享的红包',
+											// 		showCancel: false,
+											// 		success: function () {
+											// 			uni.switchTab({
+											// 				url: '/pages/index/index'
+											// 			})
+											// 		}
+											// 	})
+											// 	return
+											// }
 											params.openid = res.info.openid
 											_this.$getR('/api/getCouponInfoForShare', params).then(res => {
 												if (res.status === 'success') {
@@ -120,7 +129,13 @@ page {
 }
 .nl_share-red-title {
 	text-align: center;
-	font-size: 38rpx;
+	font-size: 40rpx;
+	color: #ffcca2;
+}
+.nl_share-red-subtitle {
+	margin-top: 16rpx;
+	text-align: center;
+	font-size: 32rpx;
 	color: #ffcca2;
 }
 .nl_share-red-max {
@@ -137,14 +152,14 @@ page {
 }
 .nl-share-get {
 	box-sizing: border-box;
-	margin: 100rpx auto 0;
-	width: 280rpx;
-	padding: 28rpx 0;
-	border: 1px solid #FEA256;
+	margin: 280rpx auto 0;
+	width: 400rpx;
+	padding: 30rpx 0;
 	text-align: center;
-	font-size: 32rpx;
+	font-size: 36rpx;
 	line-height: 1;
-	border-radius: 30rpx;
+	border-radius: 100rpx;
 	color: #fff;
+	background-color: #FEA256;
 }
 </style>

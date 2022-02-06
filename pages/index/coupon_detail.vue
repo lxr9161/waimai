@@ -1,26 +1,52 @@
 <template>
 	<view>
 		<view class="nl_back" @click="back()">返回</view>
-		<view class="nl_share-red">
-			<view class="nl_red-bg-curve1"></view>
-			<view class="nl_red-bg-curve2"></view>
-			<image class="nl_red-icon" :src="imgHost + couponInfo.icon"></image>
-		</view>
-		<view>
-			<view class="nl_share-red-title">{{ couponInfo.name }}</view>
-			<view class="nl_share-red-max">最高</view>
-			<view class="nl_share-red-price">{{ couponInfo.price }}元</view>
-			<view class="nl_coupon-detail-btns">
-				<navigator class="nl_coupon-detail-btn-default {" open-type="navigate" target="miniProgram" :app-id="couponInfo.cps_link.appid" :path="couponInfo.cps_link.link">前往领取</navigator>
-				<button class="nl_coupon-detail-btn-default nl_coupon-detai-btn-share" open-type="share" :data-coupon="couponInfo.id" :data-cover="couponInfo.cover">
-					分享好友
-				</button>
+		<view v-if="share === 1">
+			<view>
+				<view class="nl_share-red">
+					<view class="nl_red-bg-curve1"></view>
+					<view class="nl_red-bg-curve2"></view>
+					<image class="nl_red-icon" :src="imgHost + couponInfo.icon"></image>
+				</view>
+				<view>
+					<view class="nl_share-red-title">好友送你红包啦</view>
+					<view class="nl_share-red-subtitle">{{ couponInfo.name }}</view>
+					<view v-if="couponInfo.price > 0">
+						<view class="nl_share-red-max">最高</view>
+						<view class="nl_share-red-price">{{ couponInfo.price }}元</view>
+					</view>
+					<view v-else style="height: 180rpx;"></view>
+					<navigator class="nl-share-get" open-type="navigate" target="miniProgram" :app-id="couponInfo.cps_link.appid" :path="couponInfo.cps_link.link">前往领取</navigator>
+				</view>
 			</view>
 		</view>
-		<view class="nl_coupon-rules">
-			<view class="nl_coupon-rule-title">红包说明</view>
-			<view class="">
-				<view v-for="(item, index) in couponInfo.rule" class="nl_coupon-rule-item" :key="index">{{ index + 1 }}. {{ item }}</view>
+		<view v-else>
+			<view class="nl_share-red">
+				<view class="nl_red-bg-curve1"></view>
+				<view class="nl_red-bg-curve2"></view>
+				<image class="nl_red-icon" :src="imgHost + couponInfo.icon"></image>
+			</view>
+			<view>
+				<view class="nl_share-red-title">{{ couponInfo.name }}</view>
+				<view v-if="couponInfo.price">
+					<view class="nl_share-red-max">最高</view>
+					<view class="nl_share-red-price">{{ couponInfo.price }}元</view>
+				</view>
+				<view v-else="couponInfo.price">
+					<view class="nl_share-red-max" style="height: 160rpx;"></view>
+				</view>
+				<view class="nl_coupon-detail-btns">
+					<navigator class="nl_coupon-detail-btn-default {" open-type="navigate" target="miniProgram" :app-id="couponInfo.cps_link.appid" :path="couponInfo.cps_link.link">前往领取</navigator>
+					<button class="nl_coupon-detail-btn-default nl_coupon-detai-btn-share" open-type="share" :data-coupon="couponInfo.id" :data-cover="couponInfo.cover">
+						分享好友
+					</button>
+				</view>
+			</view>
+			<view class="nl_coupon-rules" v-if="couponInfo.rule && couponInfo.rule.length > 0">
+				<view class="nl_coupon-rule-title">红包说明</view>
+				<view class="">
+					<view v-for="(item, index) in couponInfo.rule" class="nl_coupon-rule-item" :key="index">{{ index + 1 }}. {{ item }}</view>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -32,28 +58,46 @@
 			return {
 				imgHost: getApp().globalData.imgHost,
 				couponInfo: {
-					price: 66,
+					price: 0,
 					link: '',
 					icon: '',
-					rule: []
-				}
+					rule: [],
+					name: ''
+				},
+				share: 0,
+				openid: ''
 			}
 		},
 		onShareAppMessage (event) {
-			let id = event.target.dataset.coupon
+			let id = this.couponInfo.id
 			let res = {
-				title: '来自好友分享外卖红包',
-				path: '/pages/share/share?coupon=' + id + '&invite_user=' + uni.getStorageSync('openid')
+				title: this.couponInfo.name,
+				path: '/pages/share/share?coupon=' + id + '&invite_user=' + this.openid
 			}
-			if (event.target.dataset.cover) {
-				res.imageUrl = this.imgHost + event.target.dataset.cover
+			if (this.couponInfo && this.couponInfo.cover) {
+				res.imageUrl = this.imgHost + this.couponInfo.cover
 			}
 			return res
 		},
+		onShareTimeline () {
+			let id = this.couponInfo.id
+			return {
+				title: this.couponInfo.name,
+				query: 'is_share=1&coupon=' + id + '&invite_user=' + this.openid,
+				imageUrl: this.imgHost + this.couponInfo.icon
+			}
+		},
 		onLoad(options) {
+			if (options.is_share === '1') {
+				this.share = 1
+				this.openid = options.invite_user
+			} else {
+				this.share = 0
+				this.openid = uni.getStorageSync('openid')
+			}
 			let params = {
 				coupon: options.coupon,
-				openid: uni.getStorageSync('openid')
+				openid: this.openid
 			}
 			this.getCouponInfo(params)
 		},
@@ -180,5 +224,29 @@ page {
 	margin-bottom: 8rpx;
 	color: #A51C1C;
 	font-size: 26rpx;
+}
+.nl_share-red-subtitle {
+	margin-top: 16rpx;
+	text-align: center;
+	font-size: 32rpx;
+	color: #ffcca2;
+}
+.nl_share-red-price {
+	text-align: center;
+	font-size: 120rpx;
+	color: #FEA256;
+	line-height: 1.1;
+}
+.nl-share-get {
+	box-sizing: border-box;
+	margin: 280rpx auto 0;
+	width: 400rpx;
+	padding: 30rpx 0;
+	text-align: center;
+	font-size: 36rpx;
+	line-height: 1;
+	border-radius: 100rpx;
+	color: #fff;
+	background-color: #FEA256;
 }
 </style>

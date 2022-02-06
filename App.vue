@@ -6,6 +6,9 @@
 			apiHost: 'https://xxxx',
 			// 图片地址域名
 			imgHost: 'https://xxxxx',
+			// 七牛玉明
+			qiniuHost: 'http://xxx'
+
 		},
 		onLaunch: function() {
 		},
@@ -30,9 +33,15 @@
 	.nl_mt-10 {
 		margin-top: 10rpx;
 	}
+	.nl_mb-20 {
+		margin-bottom: 20rpx;
+	}
 	.nl_margin-20 {
 		margin: 20rpx;
-	},
+	}
+	.nl_pb-20 {
+		padding-bottom: 20rpx;
+	}
 	.nl_color-default {
 		color: #808080;
 	}

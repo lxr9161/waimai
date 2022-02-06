@@ -2,11 +2,10 @@
 	<view>
 		<view class="nl_withdrawal-way">
 			<view class="nl_relative" v-if="withdrawalWay.account">
-				<view class="nl_text-secondary">提现到</view>
-				<view class="nl_mt-10">
+				<view class="nl_text-secondary">
+					提现到
 					<text v-if="withdrawalWay.way === 2" class="nl_text-secondary nl_mr-20">支付宝</text>
 					<text v-else-if="withdrawalWay.way === 1" class="nl_text-secondary nl_mr-20">微信</text>
-					<text>{{ withdrawalWay.account }}</text>
 				</view>
 				<navigator url="./third" class="nl_change-withdrawal-way">更换账号</navigator>
 			</view>

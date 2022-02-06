@@ -25,6 +25,11 @@
 			<view class="nl_section-head">
 				<image class="nl_section-icon" src="../../static/red_icon.png"></image>
 				<view class="nl_section-title">领红包拿返利</view>
+				<view class="nl_remind-switch-box" v-if="openAllNocticeStatus !== 1">
+					<view class="nl_remind-switch-text">优惠提醒</view>
+					<image src="../../static/remind_2.png" class="nl_remind-switch-icon"></image>
+					<switch class="nl_remind-switch" color="#fe5656" @change="openAllNotice" :checked="openAllNocticeStatus === 1"></switch>
+				</view>
 			</view>
 			<view class="nl_section-body">
 				<view class="nl_coupons">
@@ -36,13 +41,18 @@
 							</view>
 							<view class="nl_coupon-content">
 								<view class="nl_coupon-title">{{ item.name }}</view>
-								<view v-if="item.price > 0" class="nl_coupon-detail">
-									<text class="nl_coupon-price-text">最高</text>
-									<text class="nl_coupon-price">{{ item.price }}元</text>
+								<view v-if="item.sub_title">
+									<text class="nl_coupon-price-text">{{ item.sub_title }}</text>
 								</view>
-								<view v-else class="nl_coupon-detail">
-									<text class="nl_coupon-price-text">前往</text>
-									<text class="nl_coupon-price">抢购</text>
+								<view v-else>
+									<view v-if="item.price > 0" class="nl_coupon-detail">
+										<text class="nl_coupon-price-text">最高</text>
+										<text class="nl_coupon-price">{{ item.price }}元</text>
+									</view>
+									<view v-else class="nl_coupon-detail">
+										<text class="nl_coupon-price-text">前往</text>
+										<text class="nl_coupon-price">抢购</text>
+									</view>
 								</view>
 							</view>
 							<view class="nl_coupon-get">
@@ -62,13 +72,18 @@
 							</view>
 							<view class="nl_coupon-content">
 								<view class="nl_coupon-title">{{ item.name }}</view>
-								<view v-if="item.price > 0" class="nl_coupon-detail">
-									<text class="nl_coupon-price-text">最高</text>
-									<text class="nl_coupon-price">{{ item.price }}元</text>
+								<view v-if="item.sub_title">
+									<text class="nl_coupon-price-text">{{ item.sub_title }}</text>
 								</view>
-								<view v-else class="nl_coupon-detail">
-									<text class="nl_coupon-price-text">前往</text>
-									<text class="nl_coupon-price">抢购</text>
+								<view v-else>
+									<view v-if="item.price > 0" class="nl_coupon-detail">
+										<text class="nl_coupon-price-text">最高</text>
+										<text class="nl_coupon-price">{{ item.price }}元</text>
+									</view>
+									<view v-else class="nl_coupon-detail">
+										<text class="nl_coupon-price-text">前往</text>
+										<text class="nl_coupon-price">抢购</text>
+									</view>
 								</view>
 							</view>
 							<view class="nl_coupon-get">
@@ -91,43 +106,6 @@
 		<!-- <view class="nl_red-packet-item">
 			<image class="nl_red-icon" src="../../static/ele.jpeg"></image>
 		</view> -->
-		<view class="nl_section">
-			<view class="nl_section-head">
-				<image class="nl_section-icon" src="../../static/rice.png"></image>
-				<view class="nl_section-title">{{ timeTypeText }}点什么</view>
-			</view>
-			<view class="nl_section-body nl_choose-food-box">
-				<view class="nl_choose-food">{{ food }}</view>
-				<view v-if="stopFlag" class="nl_choose-run" @click="randomFood">开始</view>
-				<view v-else class="nl_choose-run" @click="stopRandomFood">停</view>
-			</view>
-		</view>
-		<view class="nl_section">
-			<view class="nl_section-head">
-				<image class="nl_section-icon" src="../../static/clock.png"></image>
-				<view class="nl_section-title">点餐提醒</view>
-			</view>
-			<view class="nl_section-body">
-				<view class="nl_notice">
-					<view>
-						<text class="nl_notice-day">每天</text>
-						<picker mode="time" class="nl_notice-clock" :value="clockNotice.clock1_str" @change="selectClock"  data-time="1">
-							<text>{{ clockNotice.clock1_str }}</text>
-						</picker>
-					</view>
-					<switch class="nl_notice-switch" color="#fe5656" @change="setClockNoticeStatus" data-time="1" :checked="clockNotice.clock1_status === 1"></switch>
-				</view>
-				<view class="nl_notice">
-					<view>
-						<text class="nl_notice-day">每天</text>
-						<picker mode="time" class="nl_notice-clock" :value="clockNotice.clock2_str" @change="selectClock" data-time="2">
-							<text>{{ clockNotice.clock2_str }}</text>
-						</picker>
-					</view>
-					<switch class="nl_notice-switch" color="#fe5656" @change="setClockNoticeStatus" data-time="2" :checked="clockNotice.clock2_status === 1"></switch>
-				</view>
-			</view>
-		</view>
 		<view class="nl_section nl_section-draw" v-if="drawStatus">
 			<view class="nl_section-head">
 				<image class="nl_section-icon" src="../../static/gift.png"></image>
@@ -144,6 +122,11 @@
 						</view>
 						<view class="nl_draw-count" v-else>
 							<text>抽奖次数已用完</text>
+						</view>
+						<view class="nl_draw-combos">
+							<view class="nl_draw-combo-btn" hover-class="nl_combo-3-hover" @click="comboDraw(3)">三连抽</view>
+							<view class="nl_draw-combo-btn nl_combo-5" hover-class="nl_combo-5-hover" @click="comboDraw(5)">五️连抽</view>
+							<view class="nl_draw-combo-btn nl_combo-10" hover-class="nl_combo-10-hover" @click="comboDraw(10)">十连抽</view>
 						</view>
 					</view>
 					<view class="nl_draw-bg-color2"></view>
@@ -162,6 +145,58 @@
 					</view>
 				</view>
 			</view>
+			<view v-if="drawComboResult.length > 0" class="nl_draw-combo-result-bg">
+				<view class="nl_draw-combo-result-title">中奖结果</view>
+				<view class="nl_draw-combo-result-close" @click="closeComboResult">
+					<image src="../../static/close.png"></image>
+				</view>
+				<view class="nl_draw-combo-result">
+					<view v-for="(item, index) in drawComboResult" :key="index" class="nl_draw-combo-result-item">
+						<view v-if="item.is_win === 0">未中奖</view>
+						<view v-else>获取<text class="nl_draw-combo-reward">{{ item.title }}</text></view>
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="nl_section">
+			<view class="nl_section-head nl_mb-20">
+				<image class="nl_section-icon" src="../../static/clock.png"></image>
+				<view class="nl_section-title">点餐提醒时间</view>
+				<view class="nl_remind-switch-box" v-if="openAllNocticeStatus !== 1">
+					<view class="nl_remind-switch-text">开启提醒</view>
+					<image src="../../static/remind_2.png" class="nl_remind-switch-icon"></image>
+					<switch class="nl_remind-switch" color="#fe5656" @change="openAllNotice" :checked="openAllNocticeStatus === 1"></switch>
+				</view>
+			</view>
+			<view class="nl_section-body">
+				<view class="nl_notice">
+					<view>
+						<text class="nl_notice-day">每天</text>
+						<picker mode="time" class="nl_notice-clock" :value="clockNotice.clock1_str" @change="selectClock"  data-time="1">
+							<text>{{ clockNotice.clock1_str }}</text>
+						</picker>
+					</view>
+				</view>
+				<view class="nl_notice">
+					<view>
+						<text class="nl_notice-day">每天</text>
+						<picker mode="time" class="nl_notice-clock" :value="clockNotice.clock2_str" @change="selectClock" data-time="2">
+							<text>{{ clockNotice.clock2_str }}</text>
+						</picker>
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="nl_section nl_pb-20">
+			<view class="nl_section-head">
+				<image class="nl_section-icon" src="../../static/rice.png"></image>
+				<view class="nl_section-title">{{ timeTypeText }}点什么</view>
+			</view>
+			<view class="nl_section-body nl_choose-food-box">
+				<view class="nl_choose-food">{{ food }}</view>
+				<view v-if="stopFlag" class="nl_choose-run" @click="randomFood">开始</view>
+				<view v-else class="nl_choose-run" @click="stopRandomFood">停</view>
+			</view>
 		</view>
 	</view>
 </template>
@@ -169,6 +204,7 @@
 <script>
 	export default {
 		onReady () {
+			this.getOpenAllNoticeStatus()
 			this.getDrawConfig()
 			this.getUserDrawCount()
 			this.getTimeType()
@@ -189,9 +225,15 @@
 			}
 			return res
 		},
+		onShareTimeline () {
+			return {
+				title: '白贝外卖券'
+			}
+		},
 		data() {
 			return {
 				link: {},
+				openAllNocticeStatus: 0,
 				imgHost: getApp().globalData.imgHost,
 				selected: -1,
 				food: '吃啥呢？🤔',
@@ -200,22 +242,23 @@
 				randomCount: 0,
 				stopFlag: true,
 				foodPool: ['白菜','玉米','麻辣烫','烧烤','白粥','奶茶'],
-				clockTime1: '10:30',
-				clockTime2: '17:00',
 				clockNotice: {
 					clock1_str: '10:30',
 					clock2_str: '17:00',
-					clock1_status: 0,
-					clock2_status: 0
+					// clock1_status: 0,
+					// clock2_status: 0
 				},
 				stopDraw: true,
 				drawBoxSort: [0, 1, 2, 4, 7, 6, 5, 3],
 				drawRewardMap: {},
 				drawItemIndex: 0,
 				onceDrawTimeLength: 80,
+				drawLock: false,
 				drawRewardConfig: [],
 				drawResult: null,
 				drawCount: 0,
+				drawComboResult: [],
+				comboCount: 0,
 				//抽奖是否开启
 				drawStatus: 0,
 				systemSetting: getApp().globalData.setting,
@@ -249,6 +292,27 @@
 						getApp().globalData.setting = res.info
 					})
 				}
+			},
+			//开启提醒
+			openAllNotice (event) {
+				console.log(event.target.value)
+				if (event.target.value) {
+					uni.requestSubscribeMessage({
+						tmplIds: [
+							'asVha12nuxeaYOSsmly2vO12HGnoBx8A5JWqOelj0_0',
+							'1RaRqIr90aC1ta-nPA8AknatsHPiWiXeqB3YHh_0BEY'
+						],
+						success: (res) => {
+							uni.setStorageSync('open_all_notice', 1)
+							this.openAllNocticeStatus = 1
+							this.setClockNotice()
+						},
+					})
+				}
+			},
+			//获取提醒状态
+			getOpenAllNoticeStatus () {
+				this.openAllNocticeStatus = uni.getStorageSync('open_all_notice')
 			},
 			// 获取优惠券列表
 			getCouponList (openid) {
@@ -286,9 +350,20 @@
 					})
 					return
 				}
+				if (this.drawCount < 1) {
+					uni.showToast({
+						icon: 'none',
+						title: '抽奖次数已用完'
+					})
+					return
+				}
 				if (!this.stopDraw) {
 					return
 				}
+				if (this.drawLock) {
+					return
+				}
+				this.drawLock = true
 				this.$getR('/api/getUserDrawCount').then(res => {
 					if (res.status === 'success') {
 						if (res.info.draw_count > 0) {
@@ -300,6 +375,7 @@
 							this.drawResult = null
 							this.drawing()
 						} else {
+							this.drawLock = false
 							uni.showToast({
 								icon: 'none',
 								title: '抽奖次数已用完'
@@ -326,6 +402,7 @@
 							} else {
 								content = '恭喜你获得' + this.drawResult.reward_info.title
 							}
+							this.drawLock = false
 							uni.showModal({
 								content: content,
 								confirmText: this.drawCount > 0 ? '再抽一次' : '次数不足' ,
@@ -347,9 +424,6 @@
 						this.getDrawResult()
 					}
 					this.onceDrawTimeLength = this.onceDrawTimeLength + 3
-					// if (this.onceDrawTimeLength > 200) {
-					// 	return
-					// }
 					this.drawing()
 				}, this.onceDrawTimeLength)
 			},
@@ -362,6 +436,92 @@
 					}
 				})
 			},
+			// 连抽
+			comboDraw (count) {
+				if (!this.drawStatus) {
+					uni.showToast({
+						icon: 'none',
+						title: '抽奖尚未开放'
+					})
+					return
+				}
+				if (this.drawCount < count) {
+					uni.showToast({
+						icon: 'none',
+						title: '抽奖次数已用完'
+					})
+					return
+				}
+				if (!this.stopDraw) {
+					return
+				}
+				if (this.drawLock) {
+					return
+				}
+				this.drawComboResult = []
+				this.drawLock = true
+				this.$getR('/api/getUserDrawCount').then(res => {
+					if (res.status === 'success') {
+						if (res.info.draw_count >= count) {
+							this.drawCount = res.info.draw_count - count
+							this.stopDraw = false
+							this.onceDrawTimeLength = 80
+							this.comboCount = count
+							this.comboDrawing()
+						} else {
+							this.drawLock = false
+							uni.showToast({
+								icon: 'none',
+								title: '抽奖次数不足' + count + '次'
+							})
+						}
+					}
+				})
+			},
+			//抽奖中
+			comboDrawing () {
+				setTimeout(() => {
+					if (this.drawItemIndex > 8) {
+						this.drawItemIndex = 0
+					}
+					this.selected = this.drawBoxSort[this.drawItemIndex]
+					this.drawItemIndex++
+					if (this.stopDraw) {
+						this.selected = -1
+						return
+					}
+					if (this.onceDrawTimeLength === 170) {
+						this.comboResult()
+					}
+					this.onceDrawTimeLength = this.onceDrawTimeLength + 3
+					this.comboDrawing()
+				}, this.onceDrawTimeLength)
+			},
+			// 获取连抽结果
+			comboResult () {
+				this.$postR('/api/drawCombo', { combo: this.comboCount }).then(res => {
+					if (res.status === 'success') {
+						this.drawComboResult = res.info.reward_list
+						this.stopDraw = true
+					}
+				}).catch(err => {
+					uni.showToast({
+						title: err.info,
+						icon: "error",
+						success: (res) => {
+							this.stopDraw = true
+							this.drawLock = false
+							this.selected = -1
+						}
+					})
+				})
+			},
+			// 关闭连抽结果弹窗
+			closeComboResult () {
+				this.drawComboResult = []
+				this.stopDraw = true
+				this.drawLock = false
+			},
 			// 设置时间
 			selectClock (event) {
 				if (event.target.dataset.time === '1') {
@@ -371,48 +531,15 @@
 				} else {
 					return
 				}
-				this.setClockNotice()
-			},
-			// 设置提醒开关
-			setClockNoticeStatus (event) {
-				let status = event.detail.value ? 1 : 0
-				if (status === 0) {
-					if (event.target.dataset.time === '1') {
-						this.clockNotice.clock1_status = status
-					} else if (event.target.dataset.time === '2') {
-						this.clockNotice.clock2_status = status
-					} else {
-						return
+				uni.requestSubscribeMessage({
+					tmplIds: [
+						'asVha12nuxeaYOSsmly2vO12HGnoBx8A5JWqOelj0_0',
+						'1RaRqIr90aC1ta-nPA8AknatsHPiWiXeqB3YHh_0BEY'
+					],
+					success: (res) => {
 					}
-					this.setClockNotice()
-				} else {
-					uni.requestSubscribeMessage({
-						tmplIds: [
-							'N9BCZEjQlLklpRuevXMVz0UMPlDePdSGBo5PM5V9Czs',
-						],
-						success: (res) => {
-							if (res.N9BCZEjQlLklpRuevXMVz0UMPlDePdSGBo5PM5V9Czs === 'accept') {
-								if (event.target.dataset.time === '1') {
-									this.clockNotice.clock1_status = 1
-								} else if (event.target.dataset.time === '2') {
-									this.clockNotice.clock2_status = 1
-								} else {
-									return
-								}
-								this.setClockNotice()
-							} else {
-								if (event.target.dataset.time === '1') {
-									this.clockNotice.clock1_status = 0
-								} else if (event.target.dataset.time === '2') {
-									this.clockNotice.clock2_status = 0
-								} else {
-									return
-								}
-								this.setClockNotice()
-							}
-						}
-					})
-				}
+				})
+				this.setClockNotice()
 			},
 			setClockNotice () {
 				this.$postR('/api/setOrderNotice', this.clockNotice).then(res => {
@@ -500,7 +627,7 @@
 
 }
 .nl_section-draw {
-	padding-bottom: 100rpx;
+	padding-bottom: 160rpx;
 }
 .nl_section-head {
 	position: relative;
@@ -541,6 +668,31 @@
 	color: #fff;
 	border-radius: 10rpx;
 	line-height: 1.5;
+}
+.nl_remind-switch-box {
+	position: absolute;
+	right: 0;
+	top: 14rpx;
+}
+.nl_remind-switch-text {
+	position: absolute;
+	top: -20rpx;
+	left: -100rpx;
+	padding: 5rpx 10rpx;
+	background-color: rgba(255,255,255, .7);
+	font-size: 28rpx;
+	border-radius: 10rpx;
+	z-index: 99;
+}
+.nl_remind-switch-icon {
+	display: inline-block;
+	margin-right: 10rpx;
+	width: 70rpx;
+	height: 70rpx;
+}
+.nl_remind-switch {
+	display: inline-block;
+	vertical-align: 28rpx;
 }
 .nl_notice {
 	position: relative;
@@ -633,7 +785,7 @@
 	z-index: 5;
 	background-color: #fe5656;
 	width: 640rpx;
-	height: 780rpx;
+	height: 850rpx;
 	border-radius: 20rpx;
 }
 .nl_draw-title {
@@ -650,6 +802,75 @@
 	text-align: right;
 	color: #fff;
 	font-size: 28rpx;
+}
+.nl_draw-combos {
+	position: absolute;
+	left: 0;
+	bottom: 26rpx;
+	width: 100%;
+	text-align: center;
+}
+.nl_draw-combo-btn {
+	display: inline-block;
+	border-radius: 10rpx;
+	padding: 12rpx 20rpx;
+	margin: 0 26rpx;
+	font-size: 32rpx;
+	color: #fff;
+	background-color: #ff8a80;
+}
+.nl_draw-combo-btn.nl_combo-5 {
+	background-color: #FFC107;
+}
+.nl_draw-combo-btn.nl_combo-10 {
+	background-color: #ba68c8;
+}
+.nl_combo-3-hover {
+	background-color: #F44336 !important;
+}
+.nl_combo-5-hover {
+	background-color: #FFA000 !important;
+}
+.nl_combo-10-hover {
+	background-color: #7B1FA2 !important;
+}
+.nl_draw-combo-result-bg {
+	box-sizing: border-box;
+	position: fixed;
+	top: 300rpx;
+	left: 50%;
+	margin-left: -230rpx;
+	padding: 20rpx 40rpx;
+	background-color: #fff;
+	border-radius: 20rpx;
+	width: 460rpx;
+	min-height: 560rpx;
+	z-index: 99999;
+}
+.nl_draw-combo-result-close {
+	position: absolute;
+	right: 0;
+	top: -70rpx;
+}
+.nl_draw-combo-result-close image {
+	width: 60rpx;
+	height: 60rpx;
+}
+.nl_draw-combo-result-title {
+	margin-bottom: 20rpx;
+	color: #fe5656;
+	font-size:36rpx;
+	text-align: center;
+	font-weight: bold;
+}
+.nl_draw-combo-result-item {
+	margin-bottom: 20rpx;
+	font-size: 28rpx;
+	text-align: center;
+}
+.nl_draw-combo-reward {
+	color: #fe5656;
+	font-weight: bold;
 }
 .nl_draw-bg-color2 {
 	box-sizing: border-box;
@@ -685,6 +906,20 @@
 	width: 540rpx;
 	height: 540rpx;
 	border-radius: 20rpx;
+}
+.nl_draw-btns {
+	margin-top: 15rpx;
+	text-align: center;
+}
+.nl_draw-btns .nl_draw-btn {
+	display: inline-block;
+	padding: 6rpx 16rpx;
+	margin: 0 24rpx;
+	border: 1px solid #fff;
+	border-radius: 10rpx;
+	font-size: 28rpx;
+	color: #fff;
+	background-color: ;
 }
 .nl_get-more-coupon {
 	margin: 30rpx 200rpx 0;

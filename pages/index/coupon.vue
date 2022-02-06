@@ -30,13 +30,18 @@
 					</view>
 					<view class="nl_coupon-content">
 						<view class="nl_coupon-title">{{ item.name }}</view>
-						<view v-if="item.price > 0" class="nl_coupon-detail">
-							<text class="nl_coupon-price-text">最高</text>
-							<text class="nl_coupon-price">{{ item.price }}元</text>
+						<view v-if="item.sub_title">
+							<text class="nl_coupon-price-text">{{ item.sub_title }}</text>
 						</view>
-						<view v-else class="nl_coupon-detail">
-							<text class="nl_coupon-price-text">前往</text>
-							<text class="nl_coupon-price">抢购</text>
+						<view v-else>
+							<view v-if="item.price > 0" class="nl_coupon-detail">
+								<text class="nl_coupon-price-text">最高</text>
+								<text class="nl_coupon-price">{{ item.price }}元</text>
+							</view>
+							<view v-else class="nl_coupon-detail">
+								<text class="nl_coupon-price-text">前往</text>
+								<text class="nl_coupon-price">抢购</text>
+							</view>
 						</view>
 					</view>
 					<view class="nl_coupon-get">
@@ -56,13 +61,18 @@
 					</view>
 					<view class="nl_coupon-content">
 						<view class="nl_coupon-title">{{ item.name }}</view>
-						<view v-if="item.price > 0" class="nl_coupon-detail">
-							<text class="nl_coupon-price-text">最高</text>
-							<text class="nl_coupon-price">{{ item.price }}元</text>
+						<view v-if="item.sub_title">
+							<text class="nl_coupon-price-text">{{ item.sub_title }}</text>
 						</view>
-						<view v-else class="nl_coupon-detail">
-							<text class="nl_coupon-price-text">前往</text>
-							<text class="nl_coupon-price">抢购</text>
+						<view v-else>
+							<view v-if="item.price > 0" class="nl_coupon-detail">
+								<text class="nl_coupon-price-text">最高</text>
+								<text class="nl_coupon-price">{{ item.price }}元</text>
+							</view>
+							<view v-else class="nl_coupon-detail">
+								<text class="nl_coupon-price-text">前往</text>
+								<text class="nl_coupon-price">抢购</text>
+							</view>
 						</view>
 					</view>
 					<view class="nl_coupon-get">

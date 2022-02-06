@@ -2,30 +2,72 @@
 	<view>
 		<view class="nl_form-box">
 			<view v-if="editing" @click="cancelSet" class="nl_third-set-cancel">取消</view>
+			<view v-if="!editing" class="nl_form-item">
+				<view class="nl_form-label">默认收款方式</view>
+				<view class="nl_form-content">
+					<view class="nl_form-text">
+						<text v-if="thirdAccount.withdrawal_way === 1">微信</text>
+						<text v-else-if="thirdAccount.withdrawal_way === 2">支付宝</text>
+					</view>
+				</view>
+			</view>
+			<view class="nl_form-item">
+				<view class="nl_form-label">微信收款码</view>
+				<view class="nl_form-content">
+					<view v-if="editing">
+						<view v-if="thirdAccount.wx_pay_qrcode">
+							<image @click="uploadImg('wx')" :src="qiniuHost + thirdAccount.wx_pay_qrcode" mode="widthFix" style="width: 300rpx;"></image>
+						</view>
+						<view v-else>
+							<image @click="uploadImg('wx')" src="../../static/add_1.png" style="width: 100rpx;height: 100rpx;" ></image>
+						</view>
+					</view>
+					<view v-else>
+						<image v-if="thirdAccount.wx_pay_qrcode" @click="preview(thirdAccount.wx_pay_qrcode)" :src="qiniuHost + thirdAccount.wx_pay_qrcode" mode="widthFix" style="width: 300rpx;"></image>
+						<view v-else class="nl_form-text nl_color-default">还未上传</view>
+					</view>
+				</view>
+			</view>
 			<view class="nl_form-item">
 				<view class="nl_form-label">微信号</view>
 				<view class="nl_form-content">
-					<input class="nl_form-input" placeholder="点击填写" v-if="editing" v-model="thirdAccount.wx_account" />
+					<input class="nl_form-input" placeholder="选填" v-if="editing" v-model="thirdAccount.wx_account" />
 					<view class="nl_form-text" v-else>
 						{{ thirdAccount.wx_account }}
-						<text v-if="thirdAccount.withdrawal_way === 1">(默认)</text>
+					</view>
+				</view>
+			</view>
+			<view class="nl_form-item">
+				<view class="nl_form-label">支付宝收款码</view>
+				<view class="nl_form-content">
+					<view v-if="editing">
+						<view v-if="thirdAccount.alipay_qrcode">
+							<image @click="uploadImg('alipay')" :src="qiniuHost + thirdAccount.alipay_qrcode" mode="widthFix" style="width: 300rpx;"></image>
+							<text v-if="thirdAccount.withdrawal_way === 2">(默认)</text>
+						</view>
+						<view v-else>
+							<image @click="uploadImg('alipay')" src="../../static/add_1.png" style="width: 100rpx;height: 100rpx;" ></image>
+						</view>
+					</view>
+					<view v-else>
+						<image v-if="thirdAccount.alipay_qrcode" @click="preview(thirdAccount.alipay_qrcode)" :src="qiniuHost + thirdAccount.alipay_qrcode" mode="widthFix" style="width: 300rpx;"></image>
+						<view v-else class="nl_form-text nl_color-default">还未上传</view>
 					</view>
 				</view>
 			</view>
 			<view class="nl_form-item">
 				<view class="nl_form-label">支付宝账号</view>
 				<view class="nl_form-content">
-					<input class="nl_form-input" placeholder="点击填写" v-if="editing" v-model="thirdAccount.alipay_account" />
+					<input class="nl_form-input" placeholder="选填" v-if="editing" v-model="thirdAccount.alipay_account" />
 					<view class="nl_form-text" v-else>
 						{{ thirdAccount.alipay_account }}
-						<text v-if="thirdAccount.withdrawal_way === 2">(默认)</text>
 					</view>
 				</view>
 			</view>
 			<view class="nl_form-item">
 				<view class="nl_form-label">姓名</view>
 				<view class="nl_form-content">
-					<input class="nl_form-input" placeholder="点击填写" v-if="editing" v-model="thirdAccount.alipay_name" />
+					<input class="nl_form-input" placeholder="选填" v-if="editing" v-model="thirdAccount.alipay_name" />
 					<view class="nl_form-text" v-else>
 						{{ thirdAccount.alipay_name }}
 					</view>
@@ -48,16 +90,19 @@
 				<button v-else @click="editing = true">设置提现账号</button>
 				<view class="nl_form-error">{{ errorMsg }}</view>
 			</view>
+			<view>{{ err }}</view>
 		</view>
 	</view>
 </template>
 
 <script>
+import { upload } from '../../utils/upload.js'
 export default {
 	data () {
 		return {
 			errorMsg: '',
 			currentWay: -1,
+			qiniuHost: getApp().globalData.qiniuHost,
 			way: [
 				{ value: 1, name: '微信' },
 				{ value: 2, name: '支付宝' }
@@ -67,16 +112,55 @@ export default {
 				wx_account: '',
 				alipay_account: '',
 				alipay_name: '',
-				withdrawal_way: 0
+				withdrawal_way: 0,
+				wx_pay_qrcode: '',
+				alipay_qrcode: ''
 			},
 			initData: {},
-			loading: false
+			loading: false,
+			uploadToken: ''
 		}
 	},
-	onShow () {
+	onLoad () {
 		this.getThirdAccount()
+		this.getUploadToken()
 	},
 	methods: {
+		preview (url) {
+			uni.previewImage({
+				urls: [
+					this.qiniuHost + url
+				]
+			})
+		},
+		// 上传二维码
+		uploadImg (type) {
+			upload(this.uploadToken).then(res => {
+				console.log(res)
+				if (type === 'wx') {
+					uni.showToast({
+						title: '上传成功',
+						icon: 'success'
+					})
+					this.thirdAccount.wx_pay_qrcode = res.key
+				} else if (type === 'alipay') {
+					uni.showToast({
+						title: '上传成功',
+						icon: 'success'
+					})
+					this.thirdAccount.alipay_qrcode = res.key
+				} else {
+					uni.showToast({
+						title: '请正确上传'
+					})
+				}
+			}).catch(err => {
+				uni.showToast({
+					title: '上传失败',
+					icon: 'error'
+				})
+			})
+		},
 		// 取消设置
 		cancelSet () {
 			this.thirdAccount = JSON.parse(this.initData)
@@ -111,8 +195,8 @@ export default {
 			if (this.loading) {
 				return
 			}
-			if (!this.thirdAccount.wx_account && !this.thirdAccount.alipay_account) {
-				this.errorMsg = '微信、支付宝至少绑定其中一个'
+			if (!this.thirdAccount.wx_pay_qrcode && !this.thirdAccount.alipay_qrcode) {
+				this.errorMsg = '请上传微信或支付宝收款码'
 				return
 			}
 			this.loading = true
@@ -127,6 +211,11 @@ export default {
 			}).catch(err => {
 				this.loading = false
 				this.errorMsg = err.info
+			})
+		},
+		getUploadToken () {
+			this.$getR('/api/getUploadToken').then(res => {
+				this.uploadToken = res.info.token
 			})
 		}
 	}
@@ -145,12 +234,12 @@ page {
 }
 .nl_form-label {
 	float: left;
-	width: 180rpx;
+	width: 200rpx;
 	text-align: right;
 	padding: 10rpx 0;
 }
 .nl_form-content {
-	margin-left: 200rpx;
+	margin-left: 220rpx;
 	min-height: 70rpx;
 }
 .nl_form-input {
@@ -164,7 +253,7 @@ page {
 	padding: 10rpx 0;
 }
 .nl_third-set-cancel {
-	position: absolute;
+	position: fixed;
 	right: 40rpx;
 	top: 20rpx;
 	color: #808080;

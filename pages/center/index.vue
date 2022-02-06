@@ -91,8 +91,18 @@
 		onShow() {
 			this.getIncomeInfo()
 			this.getSystemSetting()
+			this.incomeNotice()
 		},
 		methods: {
+			// 收益通知
+			incomeNotice () {
+				uni.getSetting({
+					withSubscriptions: true,
+					success (res) {
+						console.log(res)
+					}
+				})
+			},
 			// 获取小程序设置
 			getSystemSetting () {
 				if (getApp().globalData.setting) {
@@ -124,6 +134,12 @@
 							}
 						})
 					}
+				})
+				uni.requestSubscribeMessage({
+					tmplIds: [
+						'asVha12nuxeaYOSsmly2vO12HGnoBx8A5JWqOelj0_0',
+						'1RaRqIr90aC1ta-nPA8AknatsHPiWiXeqB3YHh_0BEY'
+					]
 				})
 			},
 			getIncomeInfo () {
@@ -251,6 +267,7 @@
 }
 .nl_center-menu {
 	margin: 20rpx 40rpx 40rpx 40rpx;
+	padding-bottom: 20rpx;
 }
 .nl_center-menu-item {
 	position: relative;
