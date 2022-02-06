@@ -6,7 +6,7 @@
 			apiHost: 'https://xxxx',
 			// 图片地址域名
 			imgHost: 'https://xxxxx',
-			// 七牛玉明
+			// 七牛存储域名
 			qiniuHost: 'http://xxx'
 
 		},
